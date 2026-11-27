@@ -1,23 +1,28 @@
+from decimal import Decimal, localcontext
 from fractions import Fraction
-from decimal import Decimal, getcontext
 
-x0 = Fraction(4)
-x1 = Fraction(17, 4)
 
-for i in range(2, 31):
-    x2 = 108 - (815 - 1500 / x0) / x1
-    x0, x1 = x1, x2
+def muller_term(n, x0, x1):
+    """Вычислить член x_n по двум начальным значениям."""
+    if n < 0:
+        raise ValueError("Номер члена должен быть неотрицательным")
+    if n == 0:
+        return x0
+    for _ in range(2, n + 1):
+        x2 = 108 - (815 - 1500 / x0) / x1
+        x0, x1 = x1, x2
+    return x1
 
-print("Приближённое значение с использованием Fraction:", float(x1))
 
-getcontext().prec = 55
-# при изменение точности меняется итоговый результат
+def main():
+    exact = muller_term(30, Fraction(4), Fraction(17, 4))
+    print("Приближённое значение с использованием Fraction:", float(exact))
 
-x0 = Decimal(4)
-x1 = Decimal(4.25)
+    with localcontext() as ctx:
+        ctx.prec = 55
+        approximate = muller_term(30, Decimal(4), Decimal("4.25"))
+    print("Приближённое значение с использованием Decimal:", float(approximate))
 
-for i in range(2, 31):
-    x2 = 108 - (815 - 1500 / x0) / x1
-    x0, x1 = x1, x2
 
-print("Приближённое значение с использованием Decimal:", float(x1))
+if __name__ == "__main__":
+    main()
